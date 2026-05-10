@@ -1,0 +1,24 @@
+{
+  "name": "juanrepetodeudero_trabajofinalmarcas",
+  "version": "1.0.0",
+  "description": "Trabajo final de la asignatura de Lenguaje de Marcas del primer curso de grado superior DAM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanrd27/JuanRepetoDeudero_TrabajoFinalMarcas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/juanrd27/JuanRepetoDeudero_TrabajoFinalMarcas/issues"
+  },
+  "homepage": "https://github.com/juanrd27/JuanRepetoDeudero_TrabajoFinalMarcas#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
