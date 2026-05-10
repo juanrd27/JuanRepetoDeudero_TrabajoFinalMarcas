@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();    // mini-servidor de rutas
-const pookemon = require("../data/pokemon");
+const pokemon = require("../data/pokemon");
 
 // ─────────────────────────────────────────────
 // GET /api/pokemon
@@ -25,15 +25,15 @@ router.get("/buscar/query", (req, res) =>
         {
             const poke = pokemon.find(p => p.id == id); // Busca en el array por id
             if(!poke)
-                return res.status(404).json({ error: 'No existe ningún pokémon con id ${id}' });
+                return res.status(404).json({ error: `No existe ningún pokémon con id ${id}` });
             return res.status(200).json(poke);   // HTTP 200 - OK
         }
 
         if(nombre)
         {
-            const poke = pokemon.find(p => p.nombre.toLowerCase() == nombre.toLowerCase());
+            const poke = pokemon.find(p => p.nombre.toLowerCase() == nombre.toLowerCase()); // Busca en el array por nombre
             if(!poke)
-                return res.status(404).json({ error: 'No existe ningún pokémon llamado ${nombre}' });
+                return res.status(404).json({ error: `No existe ningún pokémon llamado ${nombre}` });
             return res.status(200).json(poke);   // HTTP 200 - OK
         }
 
@@ -49,7 +49,7 @@ router.get("/:id", (req, res) =>
     {
         const poke = pokemon.find(p => p.id == req.params.id);  // Buscar en el array
         if(!poke)
-            return res.status(404).json({ error: 'No existe ningún pokémon con id ${req.params.id}' });
+            return res.status(404).json({ error: `No existe ningún pokémon con id ${req.params.id}` });
         return res.status(200).json(poke);
     }
 );
@@ -62,7 +62,7 @@ router.get("/:id", (req, res) =>
 router.post("/", (req, res) =>
     {
         const { nombre, tipo_1, tipo_2, generacion, region, ps, ataque, defensa, velocidad, legendario } = req.body;    // Extraemos del body los campos
-
+        
         if (!nombre || !tipo_1 || !generacion || !region || !ps || !ataque || !defensa || !velocidad)
         {
             return res.status(400).json({ error: "Faltan campos obligatorios: nombre, tipo_1, generacion, region, ps, ataque, defensa, velocidad" });
@@ -98,7 +98,7 @@ router.put("/:id", (req, res) =>
         const poke = pokemon.find(p => p.id == req.params.id);  // Busca por id
 
         if(!poke)
-            return res.status(404).json({ error: 'No existe ningún pokémon con id ${req.params.id}' });
+            return res.status(404).json({ error: `No existe ningún pokémon con id ${req.params.id}` });
 
         const { nombre, tipo_1, tipo_2, generacion, region, ps, ataque, defensa, velocidad, legendario } = req.body;
 
@@ -125,10 +125,10 @@ router.delete("/:id", (req, res) =>
     {
         const index = pokemon.findIndex(p => p.id == req.params.id);    // Buscar el id
         if(index === -1)
-            return res.status(404).json({ error: 'No existen ningún pokémon con id ${req.params.id}' });
+            return res.status(404).json({ error: `No existen ningún pokémon con id ${req.params.id}` });
 
         const eliminado = pokemon.splice(index, 1); // El pokémon eliminado
-        return res.status(200).json({ mensaje: 'Pokémon ${eliminado[0].nombre} eliminado correctamente' });
+        return res.status(200).json({ mensaje: `Pokémon ${eliminado[0].nombre} eliminado correctamente` });
     }
 );
 

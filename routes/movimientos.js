@@ -20,7 +20,7 @@ router.get("/pokemon/:pokemon_id", (req, res) =>
     {
         const movs = movimientos.filter(m => m.pokemon_id == req.params.pokemon_id);    // filter() reccorre todo el array y devuelve todos los que coincidan
         if(movs.length === 0)   // Si el array está vacío y no se encontró nada
-            return res.status(404).json({ error: 'No se encontraron movimientos para el pokémon con id ${req.params.pokemon_id}' });
+            return res.status(404).json({ error: `No se encontraron movimientos para el pokémon con id ${req.params.pokemon_id}` });
 
         return res.status(200).json(movs);
     }
@@ -62,10 +62,10 @@ router.delete("/:id", (req, res) =>
     {
         const index = movimientos.findIndex(m => m.id == req.params.id);
         if(index === -1)
-            return res.status(404).json({ error: 'No existe ningún movimiento con id ${}req.params.id' });
+            return res.status(404).json({ error: `No existe ningún movimiento con id ${req.params.id}` });
         
         const eliminado = movimientos.splice(index, 1);
-        return res.status(200).json({ mensaje: 'Movimiento ${eliminado[0].nombre} eliminado correctamente' });
+        return res.status(200).json({ mensaje: `Movimiento ${eliminado[0].nombre} eliminado correctamente` });
     }
 );
 
