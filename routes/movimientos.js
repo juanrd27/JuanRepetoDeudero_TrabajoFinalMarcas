@@ -34,7 +34,7 @@ router.post("/" , (req, res) =>
     {
         const { nombre, tipo, potencia, precision, pokemon_id } = req.body;
 
-        if(!nombre || !tipo || !potencia || !precision || !pokemon_id)
+        if(!nombre || !tipo || potencia == null || precision == null || pokemon_id == null)
         {
             return res.status(400).json({ error: "Faltan campos obligatorios: nombre, tipo, potencia, precision, pokemon_id" });
         }
@@ -51,6 +51,30 @@ router.post("/" , (req, res) =>
 
         movimientos.push(nuevoMovimiento);
         return res.status(201).json(nuevoMovimiento);
+    }
+);
+
+// ─────────────────────────────────────────────
+// PUT /api/movimientos/1
+// Modificiar un movimiento.
+// Solo se actualizan los campos que vengan en el body.
+// ─────────────────────────────────────────────
+router.put("/:id", (req, res) =>
+    {
+        const movs = movimientos.find(p => p.id == req.params.id);  // Busca por id
+
+        if(!movs)
+            return res.status(404).json({ error: `No existe ningún movimiento con id ${req.params.id}` });
+
+        const { nombre, tipo, potencia, precision, pokemon_id } = req.body;
+
+        if(nombre) movs.nombre = nombre;
+        if(tipo) movs.tipo = tipo;
+        if(potencia != null) movs.potencia = potencia;
+        if(precision != null) movs.precision = precision;
+        if(pokemon_id) movs.pokemon_id = pokemon_id;
+
+        return res.status(200).json(movs);
     }
 );
 

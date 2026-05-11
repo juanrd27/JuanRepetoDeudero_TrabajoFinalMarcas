@@ -63,11 +63,12 @@ router.post("/", (req, res) =>
     {
         const { nombre, tipo_1, tipo_2, generacion, region, ps, ataque, defensa, velocidad, legendario } = req.body;    // Extraemos del body los campos
         
-        if (!nombre || !tipo_1 || !generacion || !region || !ps || !ataque || !defensa || !velocidad)
+        if (!nombre || !tipo_1 || !generacion || !region || ps == null || ataque == null|| defensa == null || velocidad == null)
         {
             return res.status(400).json({ error: "Faltan campos obligatorios: nombre, tipo_1, generacion, region, ps, ataque, defensa, velocidad" });
         }
 
+        // To do: Parse tipos de la entrada
         const nuevoPokemon = 
         {
             id: pokemon.length + 1, // aumenta el id
@@ -111,7 +112,7 @@ router.put("/:id", (req, res) =>
         if(ataque) poke.ataque = ataque;
         if(defensa) poke.defensa = defensa;
         if(velocidad) poke.velocidad = velocidad;
-        if(legendario !== undefinded) poke.legendario = legendario;
+        if(legendario !== undefined) poke.legendario = legendario;
 
         return res.status(200).json(poke);
     }
