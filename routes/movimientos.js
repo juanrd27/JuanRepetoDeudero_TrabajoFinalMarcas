@@ -27,6 +27,58 @@ router.get("/pokemon/:pokemon_id", (req, res) =>
 );
 
 // ─────────────────────────────────────────────
+// GET /api/movimientos/buscar?nombre=rayo
+// Busca movimientos cuyo nombre contenga el texto indicado
+// ─────────────────────────────────────────────
+router.get("/buscar", (req, res) =>
+    {
+        const { nombre } = req.query;
+
+        if(!nombre)
+            return res.status(400).json({ error: "Debes indicar ?nombre=X" });
+
+        // 6. Buscar registros del recurso secundario por texto
+        const resultado = movimientos.filter(m => m.nombre.toLowerCase().includes(nombre.toLowerCase()));
+
+        if(resultado.length === 0)
+            return res.status(404).json({ error: `No se encontraron movimientos que contengan "${nombre}"` });
+
+        return res.status(200).json(resultado);
+    }
+);
+
+// ─────────────────────────────────────────────
+// GET /api/movimientos/1       → busca movimiento por id
+// GET /api/movimientos/Pikachu → busca movimientos de ese pokémon
+// ─────────────────────────────────────────────
+router.get("/:valor", (req, res) =>
+    {
+        const valor = req.params.valor;
+
+        
+        if(!isNaN(valor))   // isNaN() devuelve true si NO es un número
+        {
+            const mov = movimientos.find(m => m.id == valor);
+            if(!mov)
+                return res.status(404).json({ error: `No existe ningún movimiento con id ${valor}` });
+            return res.status(200).json(mov);
+        }
+
+        
+        const pokemon = require("../data/pokemon");
+        const poke = pokemon.find(p => p.nombre.toLowerCase() == valor.toLowerCase());  // Si es texto lo tratamos como nombre de pokémon
+        if(!poke)
+            return res.status(404).json({ error: `No existe ningún pokémon llamado ${valor}` });
+
+        const movs = movimientos.filter(m => m.pokemon_id == poke.id);
+        if(movs.length === 0)
+            return res.status(404).json({ error: `${poke.nombre} no tiene movimientos registrados` });
+
+        return res.status(200).json(movs);
+    }
+);
+
+// ─────────────────────────────────────────────
 // POST /api/movimientos
 // Crear un nuevo movimiento.
 // ─────────────────────────────────────────────

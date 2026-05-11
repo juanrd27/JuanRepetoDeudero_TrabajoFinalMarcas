@@ -42,6 +42,75 @@ router.get("/buscar/query", (req, res) =>
 );
 
 // ─────────────────────────────────────────────
+// GET /api/pokemon/filtrar
+// Filtros combinados.
+// Acepta cualquier combinación de:
+//   ?tipo=Fuego
+//   ?region=Kanto
+//   ?generacion=1
+//   ?legendario=true
+//   ?ataque_min=80
+//   ?ataque_max=130
+//   ?ps_min=50
+//   ?velocidad_min=90
+//   ?ordenar=ataque
+//   ?orden=desc
+// ─────────────────────────────────────────────
+router.get("/filtrar", (req, res) =>
+    {
+        
+        let resultado = [...pokemon];   // Copia del array original para no modificarlo
+        
+        const { tipo, region, generacion, legendario, ataque_min, ataque_max, ps_min, ps_max, velocidad_min, ordenar, orden } = req.query;
+        
+        // 3. Filtrar por múltiples campos simultáneamente (Todos los if juntos)
+        // 1. Filtrar por campo de texto (búsqueda parcial)
+        if(tipo)
+        {
+            resultado = resultado.filter(p =>
+            {
+                const tipo1 = p.tipo_1 && p.tipo_1.toLowerCase().includes(tipo.toLowerCase());
+                const tipo2 = p.tipo_2 && p.tipo_2.toLowerCase().includes(tipo.toLowerCase());
+                return tipo1 || tipo2;
+            });
+        }
+        
+        if(region) resultado = resultado.filter(p => p.region.toLowerCase() == region.toLowerCase());        
+        if(generacion) resultado = resultado.filter(p => p.generacion == generacion);
+
+        // 5. Condición booleana (legendario)
+        if(legendario !== undefined)    
+        {
+            const esLegendario = legendario === "true";     // req.query siempre es texto, por se compara con "true"
+            resultado = resultado.filter(p => p.legendario === esLegendario);
+        }
+
+        // 2. Filtrar por campo numérico con mínimo y/o máximo
+        if(ataque_min) resultado = resultado.filter(p => p.ataque >= Number(ataque_min));
+        if(ataque_max) resultado = resultado.filter(p => p.ataque <= Number(ataque_max));
+        if(ps_min) resultado = resultado.filter(p => p.ps >= Number(ps_min));
+        if(ps_max) resultado = resultado.filter(p => p.ps <= Number(ps_max));
+        if(velocidad_min) resultado = resultado.filter(p => p.velocidad >= Number(velocidad_min));
+
+        // 4. Ordenar ascendente o descendente
+        if(ordenar)
+        {
+            resultado.sort((a, b) =>
+            {
+                if(a[ordenar] < b[ordenar]) return orden === "desc" ? 1 : -1;
+                if(a[ordenar] > b[ordenar]) return orden === "desc" ? -1 : 1;
+                return 0;
+            });
+        }
+
+        if(resultado.length === 0)
+            return res.status(404).json({ error: "No se encontraron pokémon con esos filtros" });
+
+        return res.status(200).json(resultado);
+    }
+);
+
+// ─────────────────────────────────────────────
 // GET /api/pokemon/1
 // Buscar por Route Param
 // ─────────────────────────────────────────────
