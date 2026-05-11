@@ -68,10 +68,14 @@ router.post("/", (req, res) =>
             return res.status(400).json({ error: "Faltan campos obligatorios: nombre, tipo_1, generacion, region, ps, ataque, defensa, velocidad" });
         }
 
-        // To do: Parse tipos de la entrada
+        // Buscar el próximo Id disponible
+        const idsExistentes = pokemon.map(p => p.id);
+        let nuevoId = 1;
+        while(idsExistentes.includes(nuevoId)) nuevoId++;
+
         const nuevoPokemon = 
         {
-            id: pokemon.length + 1, // aumenta el id
+            id: nuevoId, // aumenta el id
             nombre,
             tipo_1,
             tipo_2: tipo_2 ?? null, // se pone null si no se recibe nada (operador nullish coalescing)
@@ -85,6 +89,7 @@ router.post("/", (req, res) =>
         };
 
         pokemon.push(nuevoPokemon);
+        pokemon.sort((a,b) => a.id - b.id); // Ordenar el array por id
         return res.status(201).json(nuevoPokemon);  // HTTP 201 - Created
     }
 );

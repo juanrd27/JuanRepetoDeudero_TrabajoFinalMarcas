@@ -39,9 +39,14 @@ router.post("/" , (req, res) =>
             return res.status(400).json({ error: "Faltan campos obligatorios: nombre, tipo, potencia, precision, pokemon_id" });
         }
 
+        // Buscar el próximo Id disponible
+        const idsExistentes = movimientos.map(m => m.id);
+        let nuevoId = 1;
+        while(idsExistentes.includes(nuevoId)) nuevoId++;
+
         const nuevoMovimiento =
         {
-            id: movimientos.length + 1,
+            id: nuevoId,
             nombre,
             tipo,
             potencia,
@@ -50,6 +55,7 @@ router.post("/" , (req, res) =>
         };
 
         movimientos.push(nuevoMovimiento);
+        movimientos.sort((a,b) => a.id - b.id); // Ordenar el array por id
         return res.status(201).json(nuevoMovimiento);
     }
 );
