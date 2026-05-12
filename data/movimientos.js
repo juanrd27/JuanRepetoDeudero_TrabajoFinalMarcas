@@ -30,7 +30,7 @@ let movimientos =
     { id: 12, nombre: "Hiperrayo",         tipo: "Normal",    potencia: 150, precision: 90,  pokemon_id: 13 },
     { id: 13, nombre: "Terratemblor",      tipo: "Tierra",    potencia: 100, precision: 100, pokemon_id: 14 },
     { id: 14, nombre: "Triturar",          tipo: "Siniestro", potencia: 80,  precision: 100, pokemon_id: 14 },
-    { id: 15, nombre: "Aura Esfera",       tipo: "Lucha",     potencia: 80,  precision: 100, pokemon_id: 15 },
+    { id: 15, nombre: "Esfera Aural",      tipo: "Lucha",     potencia: 80,  precision: 100, pokemon_id: 15 },
     { id: 16, nombre: "Velocidad Extrema", tipo: "Normal",    potencia: 80,  precision: 100, pokemon_id: 15 }
 ];
 

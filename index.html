@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex API</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-ball"></div>
+    <h1>POKé<span>DEX</span></h1>
+    <div class="header-stats">
+        <div class="header-stat">
+            <div class="header-stat-value" id="total-pokemon">—</div>
+            <div class="header-stat-label">Pokémon</div>
+        </div>
+        <div class="header-stat">
+            <div class="header-stat-value" id="total-movimientos">—</div>
+            <div class="header-stat-label">Movimientos</div>
+        </div>
+    </div>
+</header>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab('pokemon', this)">🔴 Pokémon</div>
+    <div class="tab" onclick="showTab('movimientos', this)">⚡ Movimientos</div>
+    <div class="tab" onclick="showTab('estadisticas', this)">📊 Estadísticas</div>
+</div>
+
+<div class="content">
+
+    <!-- POKÉMON -->
+    <div class="section active" id="tab-pokemon">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Tipo</label>
+                <input type="text" id="f-tipo" placeholder="Fuego...">
+            </div>
+            <div class="filter-group">
+                <label>Región</label>
+                <input type="text" id="f-region" placeholder="Kanto...">
+            </div>
+            <div class="filter-group">
+                <label>Generación</label>
+                <input type="number" id="f-generacion" placeholder="1" min="1">
+            </div>
+            <div class="filter-group">
+                <label>Legendario</label>
+                <select id="f-legendario">
+                    <option value="">Todos</option>
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Ataque mín.</label>
+                <input type="number" id="f-ataque-min" placeholder="0">
+            </div>
+            <div class="filter-group">
+                <label>Ataque máx.</label>
+                <input type="number" id="f-ataque-max" placeholder="999">
+            </div>
+            <div class="filter-group">
+                <label>Ordenar por</label>
+                <select id="f-ordenar">
+                    <option value="">Sin orden</option>
+                    <option value="nombre">Nombre</option>
+                    <option value="ps">PS</option>
+                    <option value="ataque">Ataque</option>
+                    <option value="defensa">Defensa</option>
+                    <option value="velocidad">Velocidad</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Orden</label>
+                <select id="f-orden">
+                    <option value="asc">Ascendente</option>
+                    <option value="desc">Descendente</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <div style="display:flex;gap:6px">
+                    <button class="btn btn-primary" onclick="filtrarPokemon()">Filtrar</button>
+                    <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">Pokémon <span class="count-badge" id="pokemon-count">0</span></div>
+            <button class="btn btn-primary" onclick="abrirModalPokemon()">+ Nuevo Pokémon</button>
+        </div>
+        <div class="pokemon-grid" id="pokemon-grid">
+            <div class="loading">Cargando pokémon...</div>
+        </div>
+    </div>
+
+    <!-- MOVIMIENTOS -->
+    <div class="section" id="tab-movimientos">
+        <div class="search-bar">
+            <input type="text" id="search-movimiento" placeholder="Buscar movimiento por nombre...">
+            <button class="btn btn-primary" onclick="buscarMovimiento()">Buscar</button>
+            <button class="btn btn-secondary" onclick="cargarMovimientos()">Ver todos</button>
+        </div>
+        <div class="section-header">
+            <div class="section-title">Movimientos <span class="count-badge" id="movimientos-count">0</span></div>
+            <button class="btn btn-primary" onclick="abrirModalMovimiento()">+ Nuevo Movimiento</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Nombre</th><th>Tipo</th>
+                        <th>Potencia</th><th>Precisión</th><th>Pokémon ID</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="movimientos-tbody">
+                    <tr><td colspan="7" class="loading">Cargando movimientos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="section" id="tab-estadisticas">
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-title">📈 Estadísticas de campo</div>
+                <div style="margin-bottom:14px">
+                    <select id="stats-campo" style="width:100%" onchange="cargarStats()">
+                        <option value="ataque">Ataque</option>
+                        <option value="defensa">Defensa</option>
+                        <option value="ps">PS</option>
+                        <option value="velocidad">Velocidad</option>
+                    </select>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Media</span>
+                    <span class="stat-value" id="stat-media">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Máximo</span>
+                    <span class="stat-value" id="stat-maximo">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Mínimo</span>
+                    <span class="stat-value" id="stat-minimo">—</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-title">🗄️ Total de registros</div>
+                <div class="stat-row">
+                    <span class="stat-label">Pokémon</span>
+                    <span class="stat-value" id="stat-total-pokemon">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Movimientos</span>
+                    <span class="stat-value" id="stat-total-movimientos">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="margin-bottom:20px">
+            <div class="stat-card-title">🏆 Top Pokémon</div>
+            <div class="top-controls">
+                <div class="filter-group">
+                    <label>Campo</label>
+                    <select id="top-campo">
+                        <option value="ataque">Ataque</option>
+                        <option value="defensa">Defensa</option>
+                        <option value="ps">PS</option>
+                        <option value="velocidad">Velocidad</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Cantidad (N)</label>
+                    <input type="number" id="top-n" value="5" min="1" max="15">
+                </div>
+                <div class="filter-group">
+                    <label>Orden</label>
+                    <select id="top-orden">
+                        <option value="desc">Mayor primero</option>
+                        <option value="asc">Menor primero</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="cargarTop()">Ver ranking</button>
+                </div>
+            </div>
+            <div class="top-list" id="top-list">
+                <div class="empty">Selecciona un campo y haz clic en "Ver ranking"</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-title">📊 Distribución por campo</div>
+            <div style="margin-bottom:16px">
+                <select id="agrupar-campo" style="width:200px" onchange="cargarAgrupar()">
+                    <option value="tipo_1">Tipo principal</option>
+                    <option value="tipo_2">Tipo secundario</option>
+                    <option value="region">Región</option>
+                    <option value="generacion">Generación</option>
+                </select>
+            </div>
+            <div class="bar-chart" id="bar-chart">
+                <div class="empty">Cargando...</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL POKÉMON -->
+<div class="modal-overlay" id="modal-pokemon">
+    <div class="modal">
+        <div class="modal-title" id="modal-pokemon-title">Nuevo Pokémon</div>
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Nombre *</label>
+                <input type="text" id="p-nombre" placeholder="Gengar">
+            </div>
+            <div class="form-group">
+                <label>Tipo 1 *</label>
+                <select id="p-tipo1">
+                    <option value="">Seleccionar tipo...</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Fuego">Fuego</option>
+                    <option value="Agua">Agua</option>
+                    <option value="Planta">Planta</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Hielo">Hielo</option>
+                    <option value="Lucha">Lucha</option>
+                    <option value="Veneno">Veneno</option>
+                    <option value="Tierra">Tierra</option>
+                    <option value="Volador">Volador</option>
+                    <option value="Psíquico">Psíquico</option>
+                    <option value="Bicho">Bicho</option>
+                    <option value="Roca">Roca</option>
+                    <option value="Fantasma">Fantasma</option>
+                    <option value="Dragón">Dragón</option>
+                    <option value="Siniestro">Siniestro</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Hada">Hada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo 2</label>
+                <select id="p-tipo2">
+                    <option value="">Ninguno</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Fuego">Fuego</option>
+                    <option value="Agua">Agua</option>
+                    <option value="Planta">Planta</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Hielo">Hielo</option>
+                    <option value="Lucha">Lucha</option>
+                    <option value="Veneno">Veneno</option>
+                    <option value="Tierra">Tierra</option>
+                    <option value="Volador">Volador</option>
+                    <option value="Psíquico">Psíquico</option>
+                    <option value="Bicho">Bicho</option>
+                    <option value="Roca">Roca</option>
+                    <option value="Fantasma">Fantasma</option>
+                    <option value="Dragón">Dragón</option>
+                    <option value="Siniestro">Siniestro</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Hada">Hada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Generación *</label>
+                <input type="number" id="p-generacion" placeholder="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>Región *</label>
+                <input type="text" id="p-region" placeholder="Kanto">
+            </div>
+            <div class="form-group">
+                <label>PS *</label>
+                <input type="number" id="p-ps" placeholder="60" min="0">
+            </div>
+            <div class="form-group">
+                <label>Ataque *</label>
+                <input type="number" id="p-ataque" placeholder="65" min="0">
+            </div>
+            <div class="form-group">
+                <label>Defensa *</label>
+                <input type="number" id="p-defensa" placeholder="60" min="0">
+            </div>
+            <div class="form-group">
+                <label>Velocidad *</label>
+                <input type="number" id="p-velocidad" placeholder="110" min="0">
+            </div>
+            <div class="form-group">
+                <label>Legendario</label>
+                <select id="p-legendario">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="cerrarModal('modal-pokemon')">Cancelar</button>
+            <button class="btn btn-primary" id="btn-guardar-pokemon" onclick="guardarPokemon()">Crear</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MOVIMIENTO -->
+<div class="modal-overlay" id="modal-movimiento">
+    <div class="modal">
+        <div class="modal-title" id="modal-movimiento-title">Nuevo Movimiento</div>
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Nombre *</label>
+                <input type="text" id="m-nombre" placeholder="Trueno">
+            </div>
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select id="m-tipo">
+                    <option value="">Seleccionar tipo...</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Fuego">Fuego</option>
+                    <option value="Agua">Agua</option>
+                    <option value="Planta">Planta</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Hielo">Hielo</option>
+                    <option value="Lucha">Lucha</option>
+                    <option value="Veneno">Veneno</option>
+                    <option value="Tierra">Tierra</option>
+                    <option value="Volador">Volador</option>
+                    <option value="Psíquico">Psíquico</option>
+                    <option value="Bicho">Bicho</option>
+                    <option value="Roca">Roca</option>
+                    <option value="Fantasma">Fantasma</option>
+                    <option value="Dragón">Dragón</option>
+                    <option value="Siniestro">Siniestro</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Hada">Hada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Potencia *</label>
+                <input type="number" id="m-potencia" placeholder="110" min="0">
+            </div>
+            <div class="form-group">
+                <label>Precisión *</label>
+                <input type="number" id="m-precision" placeholder="70" min="0">
+            </div>
+            <div class="form-group full">
+                <label>ID Pokémon *</label>
+                <input type="number" id="m-pokemon-id" placeholder="4" min="1">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="cerrarModal('modal-movimiento')">Cancelar</button>
+            <button class="btn btn-primary" id="btn-guardar-movimiento" onclick="guardarMovimiento()">Crear</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

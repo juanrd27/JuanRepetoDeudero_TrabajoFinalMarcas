@@ -1,7 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = 5564;
 
+app.use(cors()); // Agregar antes de las rutas
 app.use(express.json());
 
 // Importamos las rutas de los pokémons y los movimientos
