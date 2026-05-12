@@ -62,7 +62,7 @@ router.get("/filtrar", (req, res) =>
         
         let resultado = [...pokemon];   // Copia del array original para no modificarlo
         
-        const { tipo, region, generacion, legendario, ataque_min, ataque_max, ps_min, ps_max, velocidad_min, ordenar, orden } = req.query;
+        const { tipo, tipo_1, tipo_2, region, generacion, legendario, ataque_min, ataque_max, ps_min, ps_max, velocidad_min, ordenar, orden } = req.query;
         
         // Filtro 3: Filtrar por múltiples campos simultáneamente (Todos los if juntos)
         // Filtro 1: Filtrar por campo de texto (búsqueda parcial)
@@ -70,12 +70,14 @@ router.get("/filtrar", (req, res) =>
         {
             resultado = resultado.filter(p =>
             {
-                const tipo1 = p.tipo_1 && p.tipo_1.toLowerCase().includes(tipo.toLowerCase());
-                const tipo2 = p.tipo_2 && p.tipo_2.toLowerCase().includes(tipo.toLowerCase());
-                return tipo1 || tipo2;
+                const en_tipo1 = p.tipo_1 && p.tipo_1.toLowerCase().includes(tipo.toLowerCase());
+                const en_tipo2 = p.tipo_2 && p.tipo_2.toLowerCase().includes(tipo.toLowerCase());
+                return en_tipo1 || en_tipo2;
             });
         }
-        
+
+        if(tipo_1) resultado = resultado.filter(p => p.tipo_1 && p.tipo_1.toLowerCase().includes(tipo_1.toLowerCase()));
+        if(tipo_2) resultado = resultado.filter(p => p.tipo_2 && p.tipo_2.toLowerCase().includes(tipo_2.toLowerCase()));
         if(region) resultado = resultado.filter(p => p.region.toLowerCase() == region.toLowerCase());        
         if(generacion) resultado = resultado.filter(p => p.generacion == generacion);
 
