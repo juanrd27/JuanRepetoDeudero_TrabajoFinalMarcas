@@ -63,8 +63,8 @@ router.get("/filtrar", (req, res) =>
         
         const { tipo, region, generacion, legendario, ataque_min, ataque_max, ps_min, ps_max, velocidad_min, ordenar, orden } = req.query;
         
-        // 3. Filtrar por múltiples campos simultáneamente (Todos los if juntos)
-        // 1. Filtrar por campo de texto (búsqueda parcial)
+        // Filtro 3: Filtrar por múltiples campos simultáneamente (Todos los if juntos)
+        // Filtro 1: Filtrar por campo de texto (búsqueda parcial)
         if(tipo)
         {
             resultado = resultado.filter(p =>
@@ -78,21 +78,21 @@ router.get("/filtrar", (req, res) =>
         if(region) resultado = resultado.filter(p => p.region.toLowerCase() == region.toLowerCase());        
         if(generacion) resultado = resultado.filter(p => p.generacion == generacion);
 
-        // 5. Condición booleana (legendario)
+        // Filtro 5: Condición booleana (legendario)
         if(legendario !== undefined)    
         {
             const esLegendario = legendario === "true";     // req.query siempre es texto, por se compara con "true"
             resultado = resultado.filter(p => p.legendario === esLegendario);
         }
 
-        // 2. Filtrar por campo numérico con mínimo y/o máximo
+        // Filtro 2: Filtrar por campo numérico con mínimo y/o máximo
         if(ataque_min) resultado = resultado.filter(p => p.ataque >= Number(ataque_min));
         if(ataque_max) resultado = resultado.filter(p => p.ataque <= Number(ataque_max));
         if(ps_min) resultado = resultado.filter(p => p.ps >= Number(ps_min));
         if(ps_max) resultado = resultado.filter(p => p.ps <= Number(ps_max));
         if(velocidad_min) resultado = resultado.filter(p => p.velocidad >= Number(velocidad_min));
 
-        // 4. Ordenar ascendente o descendente
+        // Filtro 4: Ordenar ascendente o descendente
         if(ordenar)
         {
             resultado.sort((a, b) =>
@@ -107,6 +107,103 @@ router.get("/filtrar", (req, res) =>
             return res.status(404).json({ error: "No se encontraron pokémon con esos filtros" });
 
         return res.status(200).json(resultado);
+    }
+);
+
+// ─────────────────────────────────────────────
+// GET /api/pokemon/stats?campo=ataque
+// Devuelve la media, el máximo y el mínimo
+// del campo numérico indicado
+// ─────────────────────────────────────────────
+router.get("/stats", (req, res) => 
+    {
+        const { campo } = req.query;
+        const camposPermitidos = ["ps", "ataque", "defensa", "velocidad"];  // Solo se permiten campos numéricos
+
+        if(!campo)
+            return res.status(400).json({ error: "Debes indicar ?campo=X (ps, ataque, defensa, velocidad)" });
+
+        if(!camposPermitidos.includes(campo))
+            return res.status(400).json({ error: `Campo no válido. Usa uno de: ${camposPermitidos.join(", ")}` });
+
+        const valores = pokemon.map(p => p[campo]);     // Simplificamos el array a uno nuevo con solo los datos del campo concreto
+
+        const media = valores.reduce((sum, v) => sum + v, 0) / valores.length;
+        const maximo = Math.max(...valores);
+        const minimo = Math.min(...valores);
+
+        return res.status(200).json({ campo, media: Math.round(media *100)/100, maximo, minimo });
+
+    }
+);
+
+// ─────────────────────────────────────────────
+// GET /api/pokemon/top?campo=ataque&n=5&orden=desc
+// Devuelve los N pokémon con más o menos valor
+// en el campo indicado
+// ─────────────────────────────────────────────
+router.get("/top", (req, res) =>
+    {
+        const { campo, n, orden } = req.query;
+        const camposPermitidos = ["ps", "ataque", "defensa", "velocidad"];
+
+        if(!campo)
+            return res.status(400).json({ error: "Debes indicar ?campo=X (ps, ataque, defensa, velocidad)" });
+
+        if(!camposPermitidos.includes(campo))
+            return res.status(400).json({ error: `Campo no válido. Usa uno de: ${camposPermitidos.join(", ")}` });
+
+        const limite = n ? Number(n) : 5;   // Cogemos 5 por defecto si falla (núm.arbitrario)
+
+        if(isNaN(limite) || limite <= 0)    // Validación de N
+            return res.status(400).json({ error: "El parámetro n debe ser un número positivo" });
+
+        const ordenados = [...pokemon].sort((a,b) => orden === "asc" ? a[campo] - b[campo] : b[campo] - a[campo]);
+        const resultado = ordenados.slice(0, limite);   // Cogemos solo los N pedidos
+
+        return res.status(200).json({ campo, orden: orden || "desc", n: limite, resultado });
+    }
+);
+
+// ─────────────────────────────────────────────
+// GET /api/pokemon/total
+// Devuelve el total de pokémon y movimientos
+// ─────────────────────────────────────────────
+router.get("/total", (req, res) =>
+    {
+        const movimientos = require("../data/movimientos");     // Aquí es necesario immportar el array de movimientos
+        return res.status(200).json({ total_pokemon: pokemon.length, total_movimientos: movimientos.length });
+    }
+);
+
+// ─────────────────────────────────────────────
+// GET /api/pokemon/agrupar/?campo=tipo_1
+// GET /api/pokemon/agrupar/?campo=region
+// Cuenta cuántos pokémon hay de cada valor
+// ─────────────────────────────────────────────
+router.get("/agrupar", (req, res) => 
+    {
+        const { campo } = req.query;
+        const camposPermitidos = ["tipo_1", "tipo_2", "region", "generacion"];
+
+        if(!campo)
+            return res.status(400).json({ error: "Debes indicar ?campo=X (tipo_1, tipo_2, region, generacion)" });
+
+        if(!camposPermitidos.includes(campo))
+            return res.status(400).json({ error: `Campo no válido. Usa uno de: ${camposPermitidos.join(", ")}` });
+
+        const grupos = pokemon.reduce((acumulador, p) => // reduce devuelve un objeto tal como : { "Fuego": 3, "Agua":3, "Planta":3, ... }
+            {
+                const valor = p[campo];
+
+                if(valor === null) return acumulador;
+
+                acumulador[valor] = (acumulador[valor] || 0) + 1;
+                return acumulador;
+            }, {}
+        );
+
+        return res.status(200).json({ campo, grupos });
     }
 );
 

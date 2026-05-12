@@ -37,7 +37,7 @@ router.get("/buscar", (req, res) =>
         if(!nombre)
             return res.status(400).json({ error: "Debes indicar ?nombre=X" });
 
-        // 6. Buscar registros del recurso secundario por texto
+        // Filtro 6: Buscar registros del recurso secundario por texto
         const resultado = movimientos.filter(m => m.nombre.toLowerCase().includes(nombre.toLowerCase()));
 
         if(resultado.length === 0)
@@ -51,10 +51,9 @@ router.get("/buscar", (req, res) =>
 // GET /api/movimientos/1       → busca movimiento por id
 // GET /api/movimientos/Pikachu → busca movimientos de ese pokémon
 // ─────────────────────────────────────────────
-router.get("/:valor", (req, res) =>
+router.get("/:valor", (req, res) =>     // Route Param
     {
         const valor = req.params.valor;
-
         
         if(!isNaN(valor))   // isNaN() devuelve true si NO es un número
         {
@@ -63,7 +62,6 @@ router.get("/:valor", (req, res) =>
                 return res.status(404).json({ error: `No existe ningún movimiento con id ${valor}` });
             return res.status(200).json(mov);
         }
-
         
         const pokemon = require("../data/pokemon");
         const poke = pokemon.find(p => p.nombre.toLowerCase() == valor.toLowerCase());  // Si es texto lo tratamos como nombre de pokémon
