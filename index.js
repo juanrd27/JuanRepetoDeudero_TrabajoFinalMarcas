@@ -12,6 +12,14 @@ const movimientosRoutes = require("./routes/movimientos");
 app.use("/api/pokemon", pokemonRoutes);
 app.use("/api/movimientos", movimientosRoutes);
 
+// Manejador global de errores
+app.use((err, req, res, next) =>
+    {
+        console.error("Error inesperado:", err);
+        return res.status(500).json({ error: "Error interno del servidor" });
+    }
+);
+
 app.listen(port, () => 
     {
         console.log(`Servidor Pokémon corriendo en http://localhost:${port}`);
