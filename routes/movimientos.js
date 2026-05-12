@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const movimientos = require("../data/movimientos");
+const pokemon = require("../data/pokemon");
 
 // ─────────────────────────────────────────────
 // GET /api/movimientos
@@ -63,7 +64,6 @@ router.get("/:valor", (req, res) =>     // Route Param
             return res.status(200).json(mov);
         }
         
-        const pokemon = require("../data/pokemon");
         const poke = pokemon.find(p => p.nombre.toLowerCase() == valor.toLowerCase());  // Si es texto lo tratamos como nombre de pokémon
         if(!poke)
             return res.status(404).json({ error: `No existe ningún pokémon llamado ${valor}` });

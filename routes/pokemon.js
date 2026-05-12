@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();    // mini-servidor de rutas
 const pokemon = require("../data/pokemon");
+const movimientos = require("../data/movimientos");
 
 // ─────────────────────────────────────────────
 // GET /api/pokemon
@@ -171,7 +172,6 @@ router.get("/top", (req, res) =>
 // ─────────────────────────────────────────────
 router.get("/total", (req, res) =>
     {
-        const movimientos = require("../data/movimientos");     // Aquí es necesario immportar el array de movimientos
         return res.status(200).json({ total_pokemon: pokemon.length, total_movimientos: movimientos.length });
     }
 );
@@ -279,10 +279,10 @@ router.put("/:id", (req, res) =>
         if(tipo_2 !== undefined) poke.tipo_2 = tipo_2;
         if(generacion) poke.generacion = generacion;
         if(region) poke.region = region;
-        if(ps) poke.ps = ps;
-        if(ataque) poke.ataque = ataque;
-        if(defensa) poke.defensa = defensa;
-        if(velocidad) poke.velocidad = velocidad;
+        if(ps != null) poke.ps = ps;
+        if(ataque != null) poke.ataque = ataque;
+        if(defensa != null) poke.defensa = defensa;
+        if(velocidad != null) poke.velocidad = velocidad;
         if(legendario !== undefined) poke.legendario = legendario;
 
         return res.status(200).json(poke);
