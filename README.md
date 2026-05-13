@@ -207,7 +207,8 @@ Campos: id, nombre, tipo, potencia, precision, pokemon_id
 - **Descripción:** Modifica los campos indicados del movimiento
 - **Ejemplo:**
   - PUT http://localhost:5564/api/movimientos/7
-  ---
+
+---
 
 #### Eliminar un movimiento
 - **Método:** DELETE
@@ -226,3 +227,38 @@ Campos: id, nombre, tipo, potencia, precision, pokemon_id
 | 400    | Bad Request — faltan campos o datos incorrectos  |
 | 404    | Not Found — el recurso no existe                 |
 | 500    | Internal Server Error — error inesperado         |
+
+---
+
+## Frontend
+
+La interfaz web está compuesta por tres archivos en la raíz del proyecto:
+
+- `index.html` — estructura HTML
+- `styles.css` — estilos
+- `app.js` — lógica JavaScript
+
+Para usarla, abre `index.html` en el navegador con el servidor arrancado.
+
+### Funcionalidades
+
+#### Pestaña Pokémon
+- Ver todos los pokémon en tarjetas con tipos, estadísticas y región
+- Filtrar por tipo, región, generación, legendario y rango de ataque
+- Ordenar por cualquier campo en ascendente o descendente
+- Crear nuevos pokémon mediante formulario con selectores de tipo
+- Editar pokémon existentes
+- Eliminar pokémon con confirmación
+
+#### Pestaña Movimientos
+- Ver todos los movimientos en tabla
+- Buscar movimientos por nombre (búsqueda parcial)
+- Crear nuevos movimientos
+- Editar movimientos existentes
+- Eliminar movimientos con confirmación
+
+#### Pestaña Estadísticas
+- Media, máximo y mínimo de cualquier campo numérico
+- Total de pokémon y movimientos registrados
+- Ranking Top N pokémon por campo numérico con orden configurable
+- Gráfico de barras de distribución por tipo, región o generación

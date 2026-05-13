@@ -92,7 +92,7 @@ async function filtrarPokemon() {
     if(atMin)   params.append("ataque_min", atMin);
     if(atMax)   params.append("ataque_max", atMax);
     if(ordenar) params.append("ordenar", ordenar);
-    if(orden)   params.append("orden", orden);
+    if(ordenar && orden) params.append("orden", orden);
 
     if(params.toString() === "") { 
         cargarPokemon(); 
