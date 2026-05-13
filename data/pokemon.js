@@ -260,10 +260,10 @@ let pokemon =
         legendario: true
     },
     {
-        id: 34, nombre: "Cresselia",
-        tipo_1: "Psíquico", tipo_2: null,
+        id: 34, nombre: "Darkrai",
+        tipo_1: "Siniestro", tipo_2: null,
         generacion: 4, region: "Sinnoh",
-        ps: 120, ataque: 70, defensa: 120, velocidad: 85,
+        ps: 70, ataque: 90, defensa: 90, velocidad: 125,
         legendario: true
     },
     {
